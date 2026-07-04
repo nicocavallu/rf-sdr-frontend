@@ -1,0 +1,20 @@
+# Simulation Artifacts & Compilation Binaries
+*.vvp
+*.out
+a.out
+
+# Waveform Dumps 
+*.vcd
+*.ghw
+
+# Neovim Swap and Backup Files
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Tool Specific Logs
+*.log
+
+# Python script Outputs
+.mem
