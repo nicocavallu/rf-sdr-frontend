@@ -6,7 +6,7 @@ The goal of this project is to implement an RF Software Defined Radio (SDR) Fron
 ## System
 ![System](rf_frontend.png)
 
-The DSP pipeline consists of the following sequential blocks:
+The DSP pipeline consists of the following hardware blocks:
 1. **SDR Interface:** Receives a 16-bit `[15:0]` digital stream from the physical SDR platform.
 2. **SBC Data Formatting:** Formats SDR data into two 8-bit `[7:0]` streams.
 3. **Clock Domain Crossing Block:** Send asynchronous data from the SBC to downstream mixer as Quadrature signals.
@@ -51,5 +51,5 @@ This project was developed in an Arch Linux environment using open-source hardwa
 This repository includes a .lpf file for hardware integration of the ULX3S FPGA board.
 
 ## Reference:  
-[HackRF Course](https://www.greatscottgadgets.com/sdr/)
+[HackRF Course](https://www.greatscottgadgets.com/sdr/)  
 [Dithering](https://en.wikipedia.org/wiki/Dither)
