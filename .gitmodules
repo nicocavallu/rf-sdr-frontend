@@ -1,0 +1,3 @@
+[submodule "modules/rf-dds-lo"]
+	path = modules/rf-dds-lo
+	url = https://github.com/nicocavallu/rf-dds-lo
