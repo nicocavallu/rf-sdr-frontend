@@ -10,7 +10,7 @@ module complex_mixer(
     output reg signed [26:0] mixer_I, mixer_Q,
     output reg out_valid);
 
-    reg pipe_valid;
+    reg stage1_valid;
     reg signed [25:0] Icos, Qsin, Qcos, Isin;
 
     always @(posedge clk or negedge arst_n) begin
@@ -20,24 +20,27 @@ module complex_mixer(
             Qcos <= 26'b0;
             Isin <= 26'b0;
             out_valid <= 1'b0;
-            pipe_valid <= 1'b0;
+            stage1_valid <= 1'b0;
             mixer_I <= 27'b0;
             mixer_Q <= 27'b0;
         end else begin
 
-            if (mixer_enable) begin
-                pipe_valid<= 1'b1;
-            end else begin
-                pipe_valid <= 1'b0;
-            end
-
+            // Stage 1
+            stage1_valid <= mixer_enable;
             Icos <= $signed(sdr_signal_out[7:0]) *  $signed(signal_out[35:18]);
             Qsin <= $signed(sdr_signal_out[15:8]) *  $signed(signal_out[17:0]);
             Qcos <= $signed(sdr_signal_out[15:8]) *  $signed(signal_out[35:18]);
             Isin <= $signed(sdr_signal_out[7:0]) *  $signed(signal_out[17:0]);
-            mixer_I <= Icos + Qsin;
-            mixer_Q <= Qcos - Isin;
-            out_valid <= pipe_valid;
+
+            // Stage 2
+            out_valid <= stage1_valid;
+            if (stage1_valid) begin
+                mixer_I <= Icos + Qsin;
+                mixer_Q <= Qcos - Isin;
+            end else begin
+                mixer_I <= 27'sd0;
+                mixer_Q <= 27'sd0;
+            end
         end
     end
 

@@ -37,26 +37,26 @@ module complex_mixer_tb;
         $dumpfile("complex_mixer.vcd");
         $dumpvars(0, complex_mixer_tb);
 
-    clk = 1'b0;
-    arst_n = 1'b0;
-    mixer_enable   = 1'b0;
-    sdr_signal_out = 16'sd0;
-    signal_out     = 36'sd0;
+        clk = 1'b0;
+        arst_n = 1'b0;
+        mixer_enable   = 1'b0;
+        sdr_signal_out = 16'sd0;
+        signal_out     = 36'sd0;
 
-    repeat (2) @(negedge clk);
-    arst_n = 1'b1;
+        repeat (2) @(negedge clk);
+        arst_n = 1'b1;
 
-    @(negedge clk)
-    // Feed data
-    sdr_signal_out = {8'd0, 8'd10};
-    signal_out     = {18'd100, 18'd0};
-    mixer_enable   = 1'b1;
-    @(negedge clk);
-    mixer_enable   = 1'b0;
+        @(negedge clk)
+        // Feed data
+        sdr_signal_out = {8'd0, 8'd10};
+        signal_out     = {18'd100, 18'd0};
+        mixer_enable   = 1'b1;
+        @(negedge clk);
+        mixer_enable   = 1'b0;
 
-    repeat (5) @(negedge clk)
-    $display("Simulation complete");
-    $finish;
-end
+        repeat (5) @(negedge clk)
+        $display("Simulation complete");
+        $finish;
+    end
 
 endmodule

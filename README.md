@@ -53,3 +53,4 @@ This repository includes a .lpf file for hardware integration of the ULX3S FPGA 
 ## Reference:  
 [HackRF Course](https://www.greatscottgadgets.com/sdr/)  
 [Dithering](https://en.wikipedia.org/wiki/Dither)
+[FIR Filters](https://www.elprocus.com/fir-filter-for-digital-signal-processing/)
