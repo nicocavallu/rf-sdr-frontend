@@ -8,7 +8,7 @@ import numpy as np
 from scipy import signal
 
 # Filter Parameters 
-fs = 25.0e6
+fs = 312.5e3
 cutoff = 125.0e3
 num_taps = 31
 bits = 16
@@ -31,12 +31,12 @@ for i, c in enumerate(coeffs_int):
 print("};")
 
 # Save to a .mem file for $readmemh loading
-with open("sim/fir_coeffs.mem", "w") as f:
+with open("scripts/fir_coeffs.mem", "w") as f:
     for c in coeffs_int:
         # Convert 16-bit signed integer to two's complement hex
         hex_val = f"{c & 0xFFFF:04X}"
         f.write(f"{hex_val}\n")
 
-print("\nSaved hex coefficients to 'sim/fir_coeffs.mem'")
+print("\nSaved hex coefficients to 'scripts/fir_coeffs.mem'")
 
 
