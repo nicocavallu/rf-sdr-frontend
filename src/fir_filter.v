@@ -7,9 +7,9 @@
 
 module fir_filter(
     input clk, arst_n, cic_out,
-    input [44:0] CIC_I, CIC_Q,
+    input signed [44:0] CIC_I, CIC_Q,
     output reg fir_out,
-    output reg [65:0] FIR_I, FIR_Q);
+    output reg signed [65:0] FIR_I, FIR_Q);
 
     localparam [1:0] LOAD = 0, FILT_I = 1, FILT_Q = 2, IDLE = 3;
 
@@ -39,13 +39,14 @@ module fir_filter(
     end
 
     always @(posedge clk or negedge arst_n) begin
-        if (arst_n) begin
+        if (!arst_n) begin
             k <= 5'b0;
             state <= IDLE;
             I_accum <= 66'd0;
             Q_accum <= 66'd0;
             FIR_I <= 66'd0;
             FIR_Q <= 66'd0;
+            fir_out <= 1'b0;
 
             for (i = 0; i < 31; i = i + 1) begin
                 history_I[i] <= 45'd0;
@@ -54,12 +55,13 @@ module fir_filter(
 
         end else begin
             state <= next_state;
+            fir_out <= 1'b0;
 
             // Load new data
             if (state == LOAD) begin
                 for (i = 0; i < 31; i = i + 1) begin
                     history_I[i] <= i == 0 ? CIC_I : history_I[i - 1];
-                    history_Q[i] <= i == 0 ? CIC_Q : history_I[i - 1];
+                    history_Q[i] <= i == 0 ? CIC_Q : history_Q[i - 1];
                 end
             end
 
@@ -68,7 +70,7 @@ module fir_filter(
 
                 if (k == 5'd30) begin
                     k <= 5'd0;
-                    FIR_I <= I_accum;
+                    FIR_I <= I_accum + (taps[k] * history_I[k]);
                     I_accum <= 66'd0;
                 end else begin
                     k <= k + 1'b1;
@@ -81,18 +83,13 @@ module fir_filter(
 
                 if (k == 5'd30) begin
                     k <= 5'd0;
-                    FIR_Q <= Q_accum;
+                    FIR_Q <= Q_accum + (taps[k] * history_Q[k]);
                     Q_accum <= 66'd0;
                     fir_out <= 1'b1;
                 end else begin
                     k <= k + 1'b1;
                     Q_accum <= Q_accum + (taps[k] * history_Q[k]);
                 end
-            end
-
-            // Idle
-            else begin
-                fir_out <= 1'b0;
             end
         end
     end
