@@ -1,31 +1,32 @@
-/* digital_downconvert_tb.v
-* Testbench to test functionality of digital downconverter
+/* sdr_frontend_top_tb.v
+* Testbench to test functionality of sdr frontend project
 */
 
 `timescale 1ns/1ps
 
-module digital_downconvert_tb();
+module sdr_frontend_top_tb();
 
     // Inputs
     reg clk, arst_n, sbc_strobe, dds_enable;
     reg [7:0] sdr_signal_in;
 
     // Stimulus storage
-    reg [7:0] sdr_signal [40000];
+    reg [7:0] sdr_signal [80000];
 
     // Outputs
-    wire cic_out;
-    wire signed [44:0] CIC_I, CIC_Q;
+    wire valid_out;
+    wire signed [17:0] I_OUT, Q_OUT;
 
-    digital_downconvert uut(
+    sdr_frontend_top uut(
         .clk(clk),
         .arst_n(arst_n),
         .sbc_strobe(sbc_strobe),
         .dds_enable(dds_enable),
         .sdr_signal_in(sdr_signal_in),
-        .cic_out(cic_out),
-        .CIC_I(CIC_I),
-        .CIC_Q(CIC_Q));
+        .valid_out(valid_out),
+        .I_OUT(I_OUT),
+        .Q_OUT(Q_OUT)
+    );
 
     // Clock period
     always begin
@@ -34,11 +35,11 @@ module digital_downconvert_tb();
 
     initial begin
 
-        $dumpfile("digital_downconvert.vcd");
-        $dumpvars(0, digital_downconvert_tb);
+        $dumpfile("sdr_frontend_top.vcd");
+        $dumpvars(0, sdr_frontend_top_tb);
 
         // Load hex file
-        $readmemh("../scripts/sdr_in_40k.hex", sdr_signal);
+        $readmemh("../scripts/sdr_in_80k.hex", sdr_signal);
 
         // Reset
         clk = 1'b0;
@@ -49,7 +50,7 @@ module digital_downconvert_tb();
         dds_enable = 1'b1;
 
         // Loop through stimulus array
-        for (integer idx = 0; idx < 40000; idx = idx + 1) begin
+        for (integer idx = 0; idx < 80000; idx = idx + 1) begin
             sdr_signal_in = sdr_signal[idx];
             sbc_strobe = 1'b1;
             #40;

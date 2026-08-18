@@ -31,7 +31,7 @@ for i, c in enumerate(coeffs_int):
 print("};")
 
 # Save to a .mem file for $readmemh loading
-with open("scripts/fir_coeffs.mem", "w") as f:
+with open("fir_coeff.mem", "w") as f:
     for c in coeffs_int:
         # Convert 16-bit signed integer to two's complement hex
         hex_val = f"{c & 0xFFFF:04X}"

@@ -7,12 +7,13 @@ The goal of this project is to implement an RF Software Defined Radio (SDR) Fron
 ![System](rf_frontend.png)
 
 The DSP pipeline consists of the following hardware blocks:
-1. **SDR Interface:** Receives a 16-bit `[15:0]` digital stream from the physical SDR platform.
-2. **SBC Data Formatting:** Formats SDR data into two 8-bit `[7:0]` streams.
-3. **Clock Domain Crossing Block:** Send asynchronous data from the SBC to downstream mixer as Quadrature signals.
-4. **Mixer & DDS-LO:** Mixes Quadrature signals with local oscillator, producing a 27-bit `[26:0]` intermediate signal.
-5. **Finite Impulse Response Filter:** Provides sharp anti-aliasing baseband filtering and final stage shaping.
-6. **RNG Mixer and Truncation:** Truncates filtered signal to 16-bit `[15:0]` stream for decoding and applies RNG dithering to reduce noise caused by truncation. 
+
+* **SDR Interface & SBC Formatting:** Receives an 8-bit `[7:0]` digital sample stream (`sdr_signal_in`) synchronized via an SBC strobe control signal.
+* **Clock Domain Crossing (CDC):** Safely transfers asynchronous input samples into the main DSP processing clock domain.
+* **DDS-LO & Complex Mixer:** Mixes incoming samples with an 18-bit DDS sine/cosine carrier (`signal_out`), producing 27-bit `[26:0]` complex (I/Q) intermediate signals.
+* **CIC Decimator Filter:** Multi-stage integrator-comb filter that decimates the sample rate using 45-bit `[44:0]` internal accumulator registers to prevent overflow.
+* **FIR Anti-Aliasing Filter:** 31-tap symmetric FIR filter loaded with 16-bit coefficients (`fir_coeff.mem`) for sharp baseband shaping and CIC droop compensation.
+* **TPDF Dithering & Bit Truncation:** Applies 4-bit TPDF PRNG dither to break up quantization noise patterns before truncating the signal to the final 18-bit `[17:0]` output stream (`I_OUT`, `Q_OUT`).
 
 ## Hardware Requirements 
 
@@ -28,7 +29,7 @@ Assuming a standard US 915 MHz LoRa signal, the ULX3S 25MHz clock, and target IF
 * **Target Center Frequency:** 915 MHz  
 * **ADC Sampling Rate:** 20MSPS  
 * **Digital Down-Conversion Bandwidth:** 125kHz  
-* **Output Word Size:** 16 bits `[15:0]`
+* **Output Word Size:** 18 bits `[17:0]`
 
 
 ## Software Environment and Requirements
@@ -47,6 +48,13 @@ This project was developed in an Arch Linux environment using open-source hardwa
 
 ## Quick Start:
 
+An automated shell script 'run_sim.sh' is provided in the root directory to execute the entire SDR pipeline from scratch. To run the full frontend, go to the `/scripts` directory and make the script an executable
+
+```bash
+cd scripts  
+chmod +x sdr_frontend_test.sh  
+./sdr_frontend_test.sh
+```
 
 This repository includes a .lpf file for hardware integration of the ULX3S FPGA board.
 

@@ -20,6 +20,15 @@ module cic_filt(
     reg signed [44:0] Q_comb  [3];
     reg [5:0] strobe_count;
 
+    // Combinational Comb Difference Cascade
+    wire signed [44:0] c0_I = I_int[2] - I_delay[0];
+    wire signed [44:0] c1_I = c0_I     - I_delay[1];
+    wire signed [44:0] c2_I = c1_I     - I_delay[2];
+
+    wire signed [44:0] c0_Q = Q_int[2] - Q_delay[0];
+    wire signed [44:0] c1_Q = c0_Q     - Q_delay[1];
+    wire signed [44:0] c2_Q = c1_Q     - Q_delay[2];
+
     always @(posedge clk or negedge arst_n) begin
         if (~arst_n) begin
             for (integer i = 0; i < 3; i = i + 1) begin
@@ -44,17 +53,13 @@ module cic_filt(
                 if (strobe_count == 6'd63) begin
                     strobe_count <= 6'b0;
                     I_delay[0] <= I_int[2];
-                    I_delay[1] <= I_comb[0];
-                    I_delay[2] <= I_comb[1];
-                    I_comb[0] <= I_int[2] - I_delay[0];
-                    I_comb[1] <= I_comb[0] - I_delay[1];
-                    I_comb[2] <= I_comb[1] - I_delay[2];
+                    I_delay[1] <= c0_I;
+                    I_delay[2] <= c1_I;
+                    I_comb[2]  <= c2_I;
                     Q_delay[0] <= Q_int[2];
-                    Q_delay[1] <= Q_comb[0];
-                    Q_delay[2] <= Q_comb[1];
-                    Q_comb[0] <= Q_int[2] - Q_delay[0];
-                    Q_comb[1] <= Q_comb[0] - Q_delay[1];
-                    Q_comb[2] <= Q_comb[1] - Q_delay[2];
+                    Q_delay[1] <= c0_Q;
+                    Q_delay[2] <= c1_Q;
+                    Q_comb[2]  <= c2_Q;
                     cic_out <= 1'b1;
                 end else begin
                     strobe_count <= strobe_count + 1'b1;
